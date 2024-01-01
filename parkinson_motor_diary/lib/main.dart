@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'screen1.dart'; // 화면 1에 해당하는 위젯
+import 'screen2.dart'; // 화면 2에 해당하는 위젯
+import 'screen3.dart'; // 화면 3에 해당하는 위젯
 
-void main() {
-  runApp(const MainApp());
-}
+void main() => runApp(const MyApp());
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello Wforldfff!'),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      home: Screen1(),
     );
   }
 }
