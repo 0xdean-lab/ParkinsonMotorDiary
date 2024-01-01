@@ -10,7 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
   table_calendar: ^3.0.9
-  
+  http: ^1.1.2
+  kakao_flutter_sdk_user: ^1.2.1
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -18,3 +21,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - asset/image/
