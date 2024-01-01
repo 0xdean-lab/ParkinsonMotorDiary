@@ -60,11 +60,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
       _selectedEvents.value = _getEventsForDay(selectedDay);
     });
 
-    // 여기에 Screen2로 넘어가는 로직을 추가하거나 수정하세요.
+    // 여기에서 Screen2로 이동 시 선택된 날짜를 전달하는 방식~
     if (_selectedEvents.value.isNotEmpty) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const Screen2()),
+        MaterialPageRoute(
+            builder: (context) => Screen2(selectedDay: _selectedDay)),
       );
     }
   }
@@ -150,13 +151,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
 }
 
 class Screen2 extends StatelessWidget {
-  const Screen2({super.key});
+  final DateTime selectedDay;
+
+  const Screen2({super.key, required this.selectedDay});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Screen 2'),
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: const Color(0xfff7eeee),
+        title: Text(
+          '${selectedDay.year}년 ${selectedDay.month}월 ${selectedDay.day}일',
+          style: const TextStyle(color: Colors.black),
+        ),
       ),
       body: const Center(
         child: Text('Screen 2 Content'),
@@ -175,7 +183,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Calendar Example',
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        primaryColor: const Color(0xfff7eeee),
       ),
       home: const CalendarScreen(),
     );
