@@ -7,14 +7,14 @@ class Screen2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("화면 2")),
+      appBar: AppBar(title: const Text("파킨슨 일기")),
       body: Center(
         child: ElevatedButton(
           child: const Text("다음 화면으로"),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Screen3()),
+              MaterialPageRoute(builder: (context) => const Screen3()),
             );
           },
         ),
