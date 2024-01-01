@@ -4,7 +4,7 @@ import 'dart:collection';
 import 'screen2.dart';
 
 // 각 날짜에 대한 이벤트를 저장하는 데이터 구조를 정의합니다.
-// 여기서는 간단히 int 타입으로 체크박스의 개수를 저장하고 있습니다.
+// 여기서는 간단히 List<int> 타입으로 체크박스의 개수를 저장하고 있습니다.
 final kEvents = LinkedHashMap<DateTime, List<int>>(
   equals: isSameDay,
   hashCode: getHashCode,
@@ -40,7 +40,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedEvents = ValueNotifier([]);
+    _selectedEvents = ValueNotifier(_getEventsForDay(kToday));
   }
 
   @override
@@ -50,7 +50,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   List<int> _getEventsForDay(DateTime day) {
-    // 특정 날짜에 대한 체크박스 개수를 가져옵니다.
     return kEvents[day] ?? [];
   }
 
@@ -58,63 +57,91 @@ class _CalendarScreenState extends State<CalendarScreen> {
     setState(() {
       _selectedDay = selectedDay;
       _focusedDay = focusedDay;
+      _selectedEvents.value = _getEventsForDay(selectedDay);
     });
 
-    _selectedEvents.value = _getEventsForDay(selectedDay);
-    // TODO: screen2 위젯으로 넘어가는 로직을 추가하세요.
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => const Screen2()), // Screen2 위젯으로 교체하세요.
-    );
+    // 여기에 Screen2로 넘어가는 로직을 추가하거나 수정하세요.
+    if (_selectedEvents.value.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Screen2()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('캘린더'),
-        backgroundColor: Colors.blueGrey,
+        title: const Text(
+          '파킨슨 일기',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: const Color(0xfff7eeee),
       ),
       body: Column(
         children: [
-          TableCalendar<int>(
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            rangeSelectionMode: RangeSelectionMode.toggledOff,
-            calendarFormat: _calendarFormat,
-            eventLoader: _getEventsForDay,
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            onDaySelected: _onDaySelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
-            calendarStyle: const CalendarStyle(
-              // 여기에서 날짜 표시 스타일을 커스터마이징 할 수 있습니다.
-              markerDecoration: BoxDecoration(
-                color: Colors.pink, // 체크박스 색상 지정
-                shape: BoxShape.circle,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 80.0),
+            child: TableCalendar<int>(
+              firstDay: kFirstDay,
+              lastDay: kLastDay,
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              rangeSelectionMode: RangeSelectionMode.toggledOff,
+              calendarFormat: _calendarFormat,
+              eventLoader: _getEventsForDay,
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              onDaySelected: _onDaySelected,
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  setState(() {
+                    _calendarFormat = format;
+                  });
+                }
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              calendarStyle: const CalendarStyle(
+                todayDecoration: BoxDecoration(
+                    color: Color(0xfff7eeee), shape: BoxShape.rectangle),
+                todayTextStyle: TextStyle(color: Colors.black),
+                selectedDecoration: BoxDecoration(
+                  color: Color(0xfff7eeee),
+                  shape: BoxShape.circle,
+                ),
+                selectedTextStyle: TextStyle(color: Colors.black),
+                markerDecoration: BoxDecoration(
+                  color: Color(0xfff98da1),
+                  shape: BoxShape.circle,
+                ),
+                outsideDaysVisible: false,
+              ),
+              daysOfWeekStyle: const DaysOfWeekStyle(
+                  // 요일 행의 스타일을 정의합니다.
+                  ),
+              headerStyle: const HeaderStyle(
+                titleTextStyle: TextStyle(color: Colors.black),
+                formatButtonVisible: false,
+                leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black),
+                rightChevronIcon:
+                    Icon(Icons.chevron_right, color: Colors.black),
               ),
             ),
-            daysOfWeekStyle: const DaysOfWeekStyle(
-                // 요일 행의 스타일을 정의합니다.
+          ),
+          // 선택된 날짜의 이벤트 총합을 표시하는 UI 추가
+          ValueListenableBuilder<List<int>>(
+            valueListenable: _selectedEvents,
+            builder: (context, value, _) {
+              return Visibility(
+                visible: value.isNotEmpty,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('일기 쓴 날 : 총 ${value.length} 일'),
                 ),
-            headerStyle: const HeaderStyle(
-              // 캘린더의 헤더 부분 스타일을 정의합니다.
-              titleTextStyle: TextStyle(color: Colors.blue),
-              formatButtonVisible: false,
-              leftChevronIcon: Icon(Icons.chevron_left, color: Colors.blue),
-              rightChevronIcon: Icon(Icons.chevron_right, color: Colors.blue),
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -134,6 +161,23 @@ class Screen2 extends StatelessWidget {
       body: const Center(
         child: Text('Screen 2 Content'),
       ),
+    );
+  }
+}
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Calendar Example',
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+      ),
+      home: const CalendarScreen(),
     );
   }
 }
